@@ -10,6 +10,7 @@ void DisplayStack(int[]);
 void TakeInput(int[],char[]);
 void DisplayTree(int[]);
 void DisplayQueue(int[]);
+void DisplayLinkedList(int[]);
 typedef struct{
     float lifetime;
 }Timer;
@@ -55,7 +56,7 @@ void load_managing_window(void)
         DrawText("Values You Entered: ",20,121,20,RAYWHITE);
         DrawText(ch,MeasureText("Values You Entered: ",20)+30,121,20,RAYWHITE);
         DrawText(
-        "Select one of the following options: \n1)Display data in the form of stack\n2)Display Data in the form of queue\n3)Display Data in the form of a binary Tree\n\nEnter 1,2 or 3: ",20,181,20,RAYWHITE);
+            "Select one of the following options: \n1)Display data in the form of stack\n2)Display Data in the form of queue\n3)Display Data in the form of a binary Tree\n4)Display Data in the form of Linked List\nEnter 1,2,3 or 4: ",20,181,20,RAYWHITE);
         if(IsKeyPressed(KEY_ONE))
         {
             EndDrawing();
@@ -68,7 +69,7 @@ void load_managing_window(void)
             DrawText("Values You Entered: ",20,121,20,RAYWHITE);
             DrawText(ch,MeasureText("Values You Entered: ",20)+30,121,20,RAYWHITE);
             DrawText(
-            "Select one of the following options: \n1)Display data in the form of stack\n2)Display Data in the form of queue\n3)Display Data in the form of a binary Tree\n\nEnter 1,2 or 3: ",20,181,20,RAYWHITE);
+            "Select one of the following options: \n1)Display data in the form of stack\n2)Display Data in the form of queue\n3)Display Data in the form of a binary Tree\n4)Display Data in the form of Linked List\nEnter 1,2,3 or 4: ",20,181,20,RAYWHITE);
         }
         else if(IsKeyPressed(KEY_TWO))
         {
@@ -82,7 +83,7 @@ void load_managing_window(void)
             DrawText("Values You Entered: ",20,121,20,RAYWHITE);
             DrawText(ch,MeasureText("Values You Entered: ",20)+30,121,20,RAYWHITE);
             DrawText(
-            "Select one of the following options: \n1)Display data in the form of stack\n2)Display Data in the form of queue\n3)Display Data in the form of a binary Tree\n\nEnter 1,2 or 3: ",20,181,20,RAYWHITE);
+            "Select one of the following options: \n1)Display data in the form of stack\n2)Display Data in the form of queue\n3)Display Data in the form of a binary Tree\n4)Display Data in the form of Linked List\nEnter 1,2,3 or 4: ",20,181,20,RAYWHITE);
         }
         else if(IsKeyPressed(KEY_THREE))
         {
@@ -96,18 +97,143 @@ void load_managing_window(void)
             DrawText("Values You Entered: ",20,121,20,RAYWHITE);
             DrawText(ch,MeasureText("Values You Entered: ",20)+30,121,20,RAYWHITE);
             DrawText(
-            "Select one of the following options: \n1)Display data in the form of stack\n2)Display Data in the form of queue\n3)Display Data in the form of a binary Tree\n\nEnter 1,2 or 3: ",20,181,20,RAYWHITE);
+            "Select one of the following options: \n1)Display data in the form of stack\n2)Display Data in the form of queue\n3)Display Data in the form of a binary Tree\n4)Display Data in the form of Linked List\nEnter 1,2,3 or 4: ",20,181,20,RAYWHITE);
+        } 
+        else if(IsKeyPressed(KEY_FOUR))
+        {
+            EndDrawing();
+            CloseWindow();
+            DisplayLinkedList(array);
+            InitWindow(1000,1000,"Managing Data Structures");
+            BeginDrawing();
+            DrawText("MANAGING Data Structures",350,20,30,RAYWHITE);
+            DrawText("Input 10 random values to store: ",20,100,20,RAYWHITE);
+            DrawText("Values You Entered: ",20,121,20,RAYWHITE);
+            DrawText(ch,MeasureText("Values You Entered: ",20)+30,121,20,RAYWHITE);
+            DrawText(
+            "Select one of the following options: \n1)Display data in the form of stack\n2)Display Data in the form of queue\n3)Display Data in the form of a binary Tree\n4)Display Data in the form of Linked List\nEnter 1,2,3 or 4: ",20,181,20,RAYWHITE);
         } 
         EndDrawing();
     }
     CloseWindow();
 }
+void DisplayLinkedList(int array[])
+{
+    const int screenheight = 600;
+    const int screenwidth = 1000;
+    int i=0,j=0;
+    InitWindow(screenwidth,screenheight,"Linked Lists");
+    while(!WindowShouldClose())
+    {
+        BeginDrawing();
+        DrawText("Select one of the following options\n1)Singly Linked List\n2)Doubly Linked List\n3)Circular linked list\nEnter the format in which you want to store the data: ",10,10,20,RAYWHITE);
+        if(IsKeyPressed(KEY_ONE))
+        {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            EndDrawing();
+            while(!WindowShouldClose() && i < 10)
+            {
+                BeginDrawing();
+                DrawText("Elements are inserted in the Singly Linked in to following order",10,230,20,RAYWHITE);
+                DrawRectangle(10+j+2,300,50,50,RAYWHITE);
+                if(i <= 8)
+                {
+                DrawLine(50+j,325,85+j,325,RAYWHITE);
+                DrawLine(70+j,315,85+j,325,RAYWHITE);
+                DrawLine(70+j,335,85+j,325,RAYWHITE);
+                }
+                DrawText(TextFormat("%i",array[i]),20+j,325,25,BLACK);
+                if(IsKeyPressed(KEY_SPACE))
+                {     
+                    j += 70;
+                    ++i;
+                } 
+                EndDrawing();
+            }
+        }
+        if(IsKeyPressed(KEY_TWO))
+        {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            EndDrawing();
+            while(!WindowShouldClose() && i < 10)
+            {
+                BeginDrawing();
+                DrawText("Elements are inserted in the Doubly Linked List in to following order",10,230,20,RAYWHITE);
+                DrawRectangle(10+j+2,300,50,50,RAYWHITE);
+                if(i <= 8)
+                {
+                DrawLine(50+j,310,85+j,310,RAYWHITE);
+                DrawLine(70+j,300,85+j,310,RAYWHITE);
+                DrawLine(70+j,320,85+j,310,RAYWHITE);
+                
+                
+                DrawLine(55+j,340,75+j,330,RAYWHITE);
+                DrawLine(55+j,340,75+j,350,RAYWHITE);
+                DrawLine(50+j,340,90+j,340,RAYWHITE);
+                }
+                
+                DrawText(TextFormat("%i",array[i]),20+j,325,25,BLACK);
+                if(IsKeyPressed(KEY_SPACE))
+                {     
+                    j += 70;
+                    ++i;
+                } 
+                EndDrawing();
+            }
+        }
+        if(IsKeyPressed(KEY_THREE))
+        {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            EndDrawing();
+            while(!WindowShouldClose() && i < 10)
+            {
+                BeginDrawing();
+                DrawText("Elements are inserted in the Circular Linked List in to following order",10,230,20,RAYWHITE);
+                DrawRectangle(10+j+2,300,50,50,RAYWHITE);
+                if(i > 0)
+                {
+                DrawLine(j-20,325,15+j,325,RAYWHITE);
+                DrawLine(j,315,15+j,325,RAYWHITE);
+                DrawLine(j,335,15+j,325,RAYWHITE);
+
+               // DrawLine(37,350,37,370,RAYWHITE);
+               //DrawLine(37,370,52+j,370,RAYWHITE);
+               // DrawLine(52+j,350,52+j,370,RAYWHITE);
+                }
+                if(i>8)
+                {
+                    DrawLine(37,350,37,370,RAYWHITE);
+                    
+                    DrawLine(37,350,17,360,RAYWHITE);
+                    DrawLine(37,350,57,360,RAYWHITE);
+                    
+                    DrawLine(37,370,52+j,370,RAYWHITE);
+                    DrawLine(52+j,350,52+j,370,RAYWHITE);
+                }     
+                DrawText(TextFormat("%i",array[i]),20+j,325,25,BLACK);
+                if(IsKeyPressed(KEY_SPACE))
+                {     
+                    j += 70;
+                    ++i;
+                } 
+                EndDrawing();
+            }
+        }
+        EndDrawing();
+    }
+        CloseWindow();
+}   
 void DisplayQueue(int array[])
 {
     const int screenheight = 600;
     const int screenwidth = 1000;
     InitWindow(screenwidth,screenheight,"Queues");
     int i=0,j=0;
+    Texture2D front = LoadTexture("resources/front.png");
+    Texture2D rear = LoadTexture("resources/rear.png");
     while(!WindowShouldClose() && i < 10)
     {
         BeginDrawing();
@@ -130,6 +256,7 @@ void DisplayQueue(int array[])
         BeginDrawing();
         ClearBackground(BLACK);
         DrawText("Press p to Dequeue an element",10,10,20,RAYWHITE);
+        DrawTexture(front,10+j,300+(float)front.width,RAYWHITE);
         while(i<10)
         {
             DrawRectangle(10+j,300,80,50,GREEN);
@@ -137,6 +264,7 @@ void DisplayQueue(int array[])
             j += 90;
             ++i;
         }
+        DrawTexture(rear,10+j-90,300+(float)front.width,RAYWHITE);
         if(IsKeyPressed(KEY_P))
         {
             ++l;
