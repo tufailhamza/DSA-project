@@ -29,6 +29,168 @@ bool Expired(Timer * timer)
       return timer->lifetime <= 0;
     return 0;
 }
+class CircularQueue{
+    public:
+    int front,rear,*arr,n;
+    CircularQueue(int n)
+    {
+        front = rear = -1;
+        this->n = n;
+        arr = (int*)malloc(n*sizeof(arr));
+    }
+    bool isFull()
+    {
+        return ((front == 0 && rear == n-1) || (front == rear+1));
+    }
+    void insert(int val) {
+    if ((front == 0 && rear == n-1) || (front == rear+1))
+    {
+      //cout<<"Queue Overflow \n";
+      return;
+    }
+    if (front == -1) 
+    {
+      front = 0;
+      rear = 0;
+    } 
+    else 
+    {
+        if (rear == n - 1)
+            rear = 0;
+        else
+            rear = rear + 1;
+    }
+    arr[rear] = val ;
+    }
+    int Delete()
+    {
+        if (front == -1) 
+        {
+            return -1;
+        }
+        int temp = front;
+        if (front == rear)
+        {
+            front = -1;
+            rear = -1;
+        }
+        else 
+        {
+            if (front == n - 1)
+            front = 0;
+            else
+            front = front + 1;
+        }
+        return arr[temp];
+    }
+    void copy(int array[])
+    {
+        for(int i=0;i<n;++i)
+            insert(array[i]);
+    }
+};
+class NodeForSLL{
+    public:
+        NodeForSLL * next;
+        int data;
+        NodeForSLL(int a)
+        {
+            next = NULL;
+            data = a;
+        }
+};
+class NodeForDLL{
+    public:
+        NodeForDLL * next;
+        NodeForDLL * prev;
+        int data;
+        NodeForDLL(int a)
+        {
+            prev = next = NULL;
+            data = a;
+        }
+};
+class SLL{
+    public:
+    NodeForSLL * head;
+    SLL(NodeForSLL * n)
+    {
+        head = n;
+        head->next = NULL;
+    }
+    SLL(){head = NULL;}
+    void append(int a)
+    {
+        NodeForSLL * n = (NodeForSLL*)malloc(sizeof(NodeForSLL));
+        n->data = a;
+        if(head == NULL)
+        {
+            head = n;
+            return;
+        }
+        n->next = head;
+        head = n;
+    }
+    NodeForSLL* get_head(){return head;}
+    void Copy(int array[])
+    {
+        head = (NodeForSLL*)malloc(sizeof(NodeForSLL));
+        head->data = array[0];
+        head->next = NULL;
+        for(int i=1;i<10;++i)
+            prepend(array[i]);
+    }
+    void prepend(int a)
+    {
+        NodeForSLL * temp = (NodeForSLL*)malloc(sizeof(NodeForSLL));
+        temp = head;
+        while(temp->next != NULL)
+            temp = temp->next;
+        NodeForSLL * n = (NodeForSLL*)malloc(sizeof(NodeForSLL));
+        n->data = a;
+        temp->next = n;
+        n->next = NULL;
+    }
+    void inBetween(int a,int key)
+    {
+        NodeForSLL * n = (NodeForSLL*)malloc(sizeof(NodeForSLL));
+        n->data = a;
+        NodeForSLL * temp = (NodeForSLL*)malloc(sizeof(NodeForSLL));
+        temp = head;
+        while(temp != NULL)
+        {
+            if(temp->data == key)
+                break;
+            temp = temp->next;
+        }
+        n->next = temp->next;
+        temp->next = n;
+    }
+    bool deleteNode(int key)
+    {
+        NodeForSLL * temp = (NodeForSLL*)malloc(sizeof(NodeForSLL));
+        temp = head->next;
+        NodeForSLL * prev = (NodeForSLL*)malloc(sizeof(NodeForSLL));
+        prev = head;
+        if(prev->data == key)
+        {
+            head = head->next;
+            return true;
+        }
+        while(temp != NULL)
+        {
+            if(temp->data == key)
+                break;
+            prev = prev->next;
+            temp = temp->next;
+        }
+        if(temp == NULL)
+            return false;
+        prev->next = temp->next;
+        temp = NULL;
+        return true;
+    }
+};
 void load_managing_window(void)
 {
     InitWindow(1000,1000,"Managing");
@@ -122,6 +284,9 @@ void DisplayLinkedList(int array[])
     const int screenheight = 600;
     const int screenwidth = 1000;
     int i=0,j=0;
+    SLL  *hehe = (SLL*)malloc(sizeof(SLL));
+    NodeForSLL * temp = (NodeForSLL*)malloc(sizeof(NodeForSLL));
+    hehe->Copy(array);
     InitWindow(screenwidth,screenheight,"Linked Lists");
     while(!WindowShouldClose())
     {
@@ -129,10 +294,11 @@ void DisplayLinkedList(int array[])
         DrawText("Select one of the following options\n1)Singly Linked List\n2)Doubly Linked List\n3)Circular linked list\nEnter the format in which you want to store the data: ",10,10,20,RAYWHITE);
         if(IsKeyPressed(KEY_ONE))
         {
-            BeginDrawing();
-            ClearBackground(BLACK);
             EndDrawing();
-            while(!WindowShouldClose() && i < 10)
+            CloseWindow();
+            InitWindow(screenwidth,screenheight,"Singly Linked List");
+            //SetTargetFPS(60);
+            while(!WindowShouldClose() && i <10)
             {
                 BeginDrawing();
                 DrawText("Elements are inserted in the Singly Linked in to following order",10,230,20,RAYWHITE);
@@ -150,8 +316,127 @@ void DisplayLinkedList(int array[])
                     ++i;
                 } 
                 EndDrawing();
+                
+            } 
+            j=i=0;
+            bool flag,remove,adds,add;
+            int element = 0;
+            flag = true;
+            remove = adds = add = false;
+            Texture2D head = LoadTexture("resources/head.png");
+            while(!WindowShouldClose())
+            {
+                BeginDrawing();
+                ClearBackground(BLACK);
+                DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node to linked list",10,10,20,RAYWHITE);
+                j = 0;
+                temp = hehe->head;
+                while(temp -> next != NULL)
+                {
+                    DrawTexture(head,-15,350,RAYWHITE);
+                    DrawRectangle(10+j+2,300,50,50,GREEN);
+                    DrawLine(50+j,325,85+j,325,RAYWHITE);
+                    DrawLine(70+j,315,85+j,325,RAYWHITE);
+                    DrawLine(70+j,335,85+j,325,RAYWHITE);
+                    DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                    j += 70;
+                    temp = temp->next;                   
+                }
+                DrawRectangle(10+j+2,300,50,50,GREEN);
+                DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                if(IsKeyPressed(KEY_ONE))
+                { 
+                    int code = 0;
+                    element = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node to linked list",10,10,20,RAYWHITE);
+                        DrawText("Enter the Key: ",10,100,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,100,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 49)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    if(!hehe->deleteNode(element))
+                    while(!IsKeyPressed(KEY_ENTER))
+                    {
+                        BeginDrawing();
+                        DrawText("A Node with this key does not exist.\nPress enter to continue",10,125,20,RAYWHITE);
+                        EndDrawing();
+                    }
+                }
+                if(IsKeyPressed(KEY_TWO))
+                { 
+                    int code = 0;
+                    element = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node to linked list",10,10,20,RAYWHITE);
+                        DrawText("Enter the Key: ",10,100,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,100,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 50)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    hehe->append(element);
+                }
+                if(IsKeyPressed(KEY_THREE))
+                { 
+                    int code = 0;
+                    element = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node to linked list",10,10,20,RAYWHITE);
+                        DrawText("Enter the Key: ",10,100,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,100,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 51)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    hehe->prepend(element);
+                }
+                EndDrawing();
             }
+            
+            CloseWindow();
+            InitWindow(screenwidth,screenheight,"Linked Lists");
+            BeginDrawing();
+            DrawText("Select one of the following options\n1)Singly Linked List\n2)Doubly Linked List\n3)Circular linked list\nEnter the format in which you want to store the data: ",10,10,20,RAYWHITE);
         }
+        
         if(IsKeyPressed(KEY_TWO))
         {
             BeginDrawing();
@@ -198,10 +483,6 @@ void DisplayLinkedList(int array[])
                 DrawLine(j-20,325,15+j,325,RAYWHITE);
                 DrawLine(j,315,15+j,325,RAYWHITE);
                 DrawLine(j,335,15+j,325,RAYWHITE);
-
-               // DrawLine(37,350,37,370,RAYWHITE);
-               //DrawLine(37,370,52+j,370,RAYWHITE);
-               // DrawLine(52+j,350,52+j,370,RAYWHITE);
                 }
                 if(i>8)
                 {
@@ -223,6 +504,7 @@ void DisplayLinkedList(int array[])
             }
         }
         EndDrawing();
+        
     }
         CloseWindow();
 }   
@@ -251,32 +533,119 @@ void DisplayQueue(int array[])
     bool flag = false;
     j=i=0;
     int l = 0;
+    int front_pos,rear_pos;
+    int element;
+    CircularQueue q(10);
+    q.copy(array);
     while(!WindowShouldClose() && l < 10)
     {
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawText("Press p to Dequeue an element",10,10,20,RAYWHITE);
-        DrawTexture(front,10+j,300+(float)front.width,RAYWHITE);
-        while(i<10)
+        DrawText("Press p to Dequeue an element\n\nEnter an element to Enqueue: ",10,10,20,RAYWHITE);
+        front_pos = q.front*90;
+        rear_pos = q.rear*90;
+        DrawTexture(front,10+front_pos,300+(float)front.width,RAYWHITE);
+        DrawTexture(rear,10+rear_pos,300+(float)front.width,RAYWHITE);
+        int f = q.front,r = q.rear;
+        if(f <= r)
         {
-            DrawRectangle(10+j,300,80,50,GREEN);
-            DrawText(TextFormat("%i",array[i]),10+j+40,325,30,BLACK);
-            j += 90;
-            ++i;
+            while(f <= r)
+            {
+                DrawRectangle(10+f*90,300,80,50,GREEN);
+                DrawText(TextFormat("%i",q.arr[f]),50+f*90-30,325,30,BLACK);
+                ++f;
+            }
         }
-        DrawTexture(rear,10+j-90,300+(float)front.width,RAYWHITE);
+        else
+        {
+            while(f <= q.n-1)
+            {
+                DrawRectangle(10+f*90,300,80,50,GREEN);
+                DrawText(TextFormat("%i",q.arr[f]),50+f*90-30,325,30,BLACK);
+                ++f;
+            }
+            f = 0;
+            while(f <= r)
+            {
+                DrawRectangle(10+f*90,300,80,50,GREEN);
+                DrawText(TextFormat("%i",q.arr[f]),50+f*90-30,325,30,BLACK);
+                ++f;
+            }
+        }
+        int hehe;
         if(IsKeyPressed(KEY_P))
         {
-            ++l;
             flag = true;
+            hehe = q.Delete();
+            element = 0;
         }
         if(flag)
         {
-            DrawText(TextFormat("Element Dequeued: %i",array[l-1]),10,35,20,RAYWHITE);
+            DrawText(TextFormat("Element Dequeued: %i",hehe),10,35,20,RAYWHITE);
             DrawText("Remaining Queue: ",10,160,20,RAYWHITE);
         }
-        i=l;
-        j = 90*l;
+        if(q.isFull())
+        {
+            DrawText("Queue Full!",MeasureText("Enter an element to Enqueue: ",20)+10,70,20,RAYWHITE);
+        }
+        else
+        {
+            if(IsKeyPressed(KEY_ZERO))
+                element *= 10;
+            if(IsKeyPressed(KEY_ONE))
+            {
+                element *= 10;
+                element += 1;
+            }
+            if(IsKeyPressed(KEY_TWO))
+        {
+            element *= 10;
+            element += 2;
+
+        }  
+        if(IsKeyPressed(KEY_THREE))
+        {
+            element *= 10;
+            element += 3;
+
+        }  
+        if(IsKeyPressed(KEY_FOUR))
+        {
+            element *= 10;
+            element += 4;
+        }  
+        if(IsKeyPressed(KEY_FIVE))
+        {
+            element *= 10;
+            element += 5;
+        }  
+        if(IsKeyPressed(KEY_SIX))
+        {
+            element *= 10;
+            element += 6;
+        }  
+        if(IsKeyPressed(KEY_SEVEN))
+        {
+            element *= 10;
+            element += 7;
+        }  
+        if(IsKeyPressed(KEY_EIGHT))
+        {
+            element *= 10;
+            element += 8;
+        }  
+        if(IsKeyPressed(KEY_NINE))
+        {
+            element *= 10;
+            element += 9;
+        }
+        DrawText(TextFormat("%i",element),MeasureText("Enter an element to Enqueue: ",20)+10,70,20,RAYWHITE);
+        if(IsKeyPressed(KEY_ENTER))
+        {
+        q.insert(element);
+            element = 0;
+        }
+        }
         EndDrawing();
     }
     CloseWindow();
@@ -408,12 +777,13 @@ void DisplayStack(int array[])
     pos.y = 570.0f;
     int l = 10;
     bool flag = false;
+    int temp;
     ClearBackground(BLACK);
     while(!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawText("Press p to pop an element",10,10,20,RAYWHITE);
+        DrawText("Press p to pop an element\n\nEnter an element to push into stack: ",10,10,20,RAYWHITE);
         while(i<l)
         {
             DrawRectangle(200,600-j,250,30,GREEN);
@@ -422,14 +792,76 @@ void DisplayStack(int array[])
             pos.y -= 35.0f;
             ++i;
         }
+        
+        if(l == 10)
+        {
+                DrawText("Stack overflow!",MeasureText("Enter an element to push into stack: ",20)+10,70,20,RAYWHITE);
+        }
+        else
+        {
+            if(IsKeyPressed(KEY_ZERO))
+            array[l-1] *= 10;  
+        if(IsKeyPressed(KEY_ONE))
+        {
+            array[l] *= 10;
+            array[l] += 1;
+        }  
+        if(IsKeyPressed(KEY_TWO))
+        {
+            array[l] *= 10;
+            array[l] += 2;
+
+        }  
+        if(IsKeyPressed(KEY_THREE))
+        {
+            array[l] *= 10;
+            array[l] += 3;
+
+        }  
+        if(IsKeyPressed(KEY_FOUR))
+        {
+            array[l] *= 10;
+            array[l] += 4;
+        }  
+        if(IsKeyPressed(KEY_FIVE))
+        {
+            array[l] *= 10;
+            array[l] += 5;
+        }  
+        if(IsKeyPressed(KEY_SIX))
+        {
+            array[l] *= 10;
+            array[l] += 6;
+        }  
+        if(IsKeyPressed(KEY_SEVEN))
+        {
+            array[l] *= 10;
+            array[l] += 7;
+        }  
+        if(IsKeyPressed(KEY_EIGHT))
+        {
+            array[l] *= 10;
+            array[l] += 8;
+        }  
+        if(IsKeyPressed(KEY_NINE))
+        {
+            array[l] *= 10;
+            array[l] += 9;
+        }
+        DrawText(TextFormat("%i",array[l]),MeasureText("Enter an element to push into stack: ",20)+10,70,20,RAYWHITE);
+        if(IsKeyPressed(KEY_ENTER))
+            ++l;
+        }
         if(IsKeyPressed(KEY_P))
         {
+            temp = array[l-1];
+            array[l-1] = 0;
             --l;
             flag = true;
         }
         if(flag)
         {
-            DrawText(TextFormat("Element Popped: %i",array[i]),10,35,20,RAYWHITE);
+            DrawText(TextFormat("Element Popped: %i",temp),10,35,20,RAYWHITE);
             DrawText("Remaining Stack: ",10,160,20,RAYWHITE);
         }
         i=0;
@@ -480,10 +912,8 @@ int main(void)
     Rectangle managing = {text_width,text_height,(float)MeasureText("Managing Data Structures",30),40};
     Rectangle searching = {text_width,text_height+50,(float)MeasureText("Searching",30),40};
     Rectangle sorting = {text_width,text_height+100,(float)MeasureText("Sorting",30),40};
-    float rotation = 0;
     while(!WindowShouldClose())
     {
-        rotation+=0.1f;
         BeginDrawing();
         ClearBackground(BLACK);
         DrawTextureRec(logo,SourceRec,Vector2{screenwidth-logo_width+20,0},RAYWHITE);
