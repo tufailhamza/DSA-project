@@ -11,24 +11,6 @@ void TakeInput(int[],char[]);
 void DisplayTree(int[]);
 void DisplayQueue(int[]);
 void DisplayLinkedList(int[]);
-typedef struct{
-    float lifetime;
-}Timer;
-void Start(Timer * timer,float a)
-{
-    timer->lifetime = a;
-}
-void Update(Timer * timer)
-{
-    if(timer != NULL)
-    timer->lifetime -= GetFrameTime();
-}
-bool Expired(Timer * timer)
-{
-    if(timer != NULL)
-      return timer->lifetime <= 0;
-    return 0;
-}
 class CircularQueue{
     public:
     int front,rear,*arr,n;
@@ -109,6 +91,201 @@ class NodeForDLL{
             prev = next = NULL;
             data = a;
         }
+};
+class NodeForCLL{
+    public:
+        NodeForCLL * next;
+		int data;
+		NodeForCLL()
+		{
+			next = NULL;
+			data = 0;
+		}
+		NodeForCLL(int a)
+		{
+			data = a;
+		}
+};
+class CLL{
+    public:
+		NodeForCLL * head;
+		NodeForCLL * tail;
+		CLL()
+		{
+			head = tail = NULL;
+		}
+		CLL(NodeForCLL * temp)
+		{
+			head = tail = temp;
+		}
+		void append(int a)
+		{
+            NodeForCLL* n = (NodeForCLL*)malloc(sizeof(NodeForCLL));
+            n->data = a;
+			tail->next = n;
+			n->next = head;
+			tail = n;
+		}
+        void Copy(int array[])
+        {
+            NodeForCLL* n = (NodeForCLL*)malloc(sizeof(NodeForCLL));
+            n->data = array[0];
+            head = n;
+            n->next = NULL;
+            tail = head;
+            for(int i=1;i<10;++i)
+                append(array[i]);
+        }
+		void prepend(int a)
+		{
+            NodeForCLL* n = (NodeForCLL*)malloc(sizeof(NodeForCLL));
+            n->data = a;
+			tail->next = n;
+			n->next = head;
+			head = n;
+		}
+        
+		bool AddUsingKey(int a,int key)
+		{
+            NodeForCLL * n = (NodeForCLL*)malloc(sizeof(NodeForCLL));
+            n->data = a;
+			if(tail->data == key)
+			{
+				append(n->data);
+				return 1;
+			}
+			NodeForCLL * temp = head;
+			while(temp != tail)
+			{
+				if(temp->data == key)
+				break;
+				temp = temp->next;
+			}
+            if(temp == tail)
+               return 0;
+			n->next = temp->next;
+			temp->next = n;
+            return 1;
+		}
+		bool deleteNode(int key)
+		{
+			if(head->data == key)
+			{
+				tail->next = head->next;
+				head = head->next;
+				return 1;
+			}
+			if(tail->data == key)
+			{
+				NodeForCLL * temp = head;
+				while(temp->next != tail)
+					temp = temp->next;
+				temp->next = head;
+                tail = temp;
+				return 1;
+			}
+			NodeForCLL * temp = head->next;
+			NodeForCLL * prev = head;
+			do{
+				if(temp->data == key)
+					break;
+				temp = temp->next;
+				prev = prev->next;
+			}
+			while(temp!=head);
+            if(temp == head)
+                return 0;
+			prev->next = temp->next;
+			return 1;
+		}
+};
+class DLL{
+	public:
+		NodeForDLL * head;
+		NodeForDLL * tail;
+		DLL(){
+			head = tail = NULL;
+		}
+		DLL(NodeForDLL * n)
+		{
+			head = tail = n;
+		}
+		void append(int a)
+		{
+            NodeForDLL * n = (NodeForDLL*)malloc(sizeof(NodeForDLL));
+            n->data = a;
+			tail->next = n;
+			n->prev = tail;
+			n->next = NULL;
+			tail = n;
+		}
+        void Copy(int array[])
+        {
+            head = (NodeForDLL*)malloc(sizeof(NodeForDLL));
+            head->data = array[0];
+            tail = head;
+            head->next = head->prev = NULL;
+            for(int i=1;i<10;++i)
+                append(array[i]);
+        }
+		void prepend(int a)
+		{
+            NodeForDLL * n = (NodeForDLL*)malloc(sizeof(NodeForDLL));
+            n->data = a;
+			n->next = head;
+			head->prev = n;
+			n->prev = NULL;
+			head = n;
+		}
+		void AddUsingKey(int a,int key)
+		{
+            NodeForDLL * n = (NodeForDLL*)malloc(sizeof(NodeForDLL));
+            n->data = a;
+			if(tail->data == key)
+			{
+				append(n->data);
+				return;
+			}
+			NodeForDLL * temp = head;
+            
+			while(temp != NULL)
+			{
+				if(temp->data == key)
+				break;
+				temp = temp->next;
+			}
+			temp->next->prev = n;
+			n->next = temp->next;
+			n->prev = temp;
+			temp->next = n;
+		}
+		bool DeleteNode(int key)
+		{
+			if(head->data == key)
+			{
+				head = head->next;
+				head->prev = NULL;
+				return 1;
+			}
+			if(tail->data == key)
+			{
+				tail = tail->prev;
+				tail->next = NULL;
+				return 1;
+			}
+			NodeForDLL * temp = head;
+			while(temp != NULL)
+			{
+				if(temp->data == key)
+				break;
+				temp = temp->next;
+			}
+            if(temp == NULL)
+                return 0;
+			temp->prev->next = temp->next;
+			temp = NULL;
+            return 1;
+		}
 };
 class SLL{
     public:
@@ -191,6 +368,7 @@ class SLL{
         return true;
     }
 };
+                
 void load_managing_window(void)
 {
     InitWindow(1000,1000,"Managing");
@@ -319,16 +497,13 @@ void DisplayLinkedList(int array[])
                 
             } 
             j=i=0;
-            bool flag,remove,adds,add;
             int element = 0;
-            flag = true;
-            remove = adds = add = false;
             Texture2D head = LoadTexture("resources/head.png");
             while(!WindowShouldClose())
             {
                 BeginDrawing();
                 ClearBackground(BLACK);
-                DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node to linked list",10,10,20,RAYWHITE);
+                DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node at the end of linked list\n4)Add a node in between",10,10,20,RAYWHITE);
                 j = 0;
                 temp = hehe->head;
                 while(temp -> next != NULL)
@@ -353,8 +528,23 @@ void DisplayLinkedList(int array[])
                     {
                         BeginDrawing();
                         ClearBackground(BLACK);
-                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node to linked list",10,10,20,RAYWHITE);
-                        DrawText("Enter the Key: ",10,100,20,RAYWHITE);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,325,85+j,325,RAYWHITE);
+                            DrawLine(70+j,315,85+j,325,RAYWHITE);
+                            DrawLine(70+j,335,85+j,325,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node at the end of linked list\n4)Add a node in between",10,10,20,RAYWHITE);
+                        DrawText("Enter the Key: ",10,130,20,RAYWHITE);
                         if(code >= 48 && code <= 57 && flag)
                         {
                             element *= 10;
@@ -362,7 +552,7 @@ void DisplayLinkedList(int array[])
                         }
                         if(IsKeyPressed(KEY_BACKSPACE))
                             element /= 10;
-                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,100,20,RAYWHITE);
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,130,20,RAYWHITE);
                         code = GetKeyPressed();
                         if(code != 49)
                             flag = true;
@@ -372,7 +562,7 @@ void DisplayLinkedList(int array[])
                     while(!IsKeyPressed(KEY_ENTER))
                     {
                         BeginDrawing();
-                        DrawText("A Node with this key does not exist.\nPress enter to continue",10,125,20,RAYWHITE);
+                        DrawText("A Node with this key does not exist.\nPress enter to continue",10,160,20,RAYWHITE);
                         EndDrawing();
                     }
                 }
@@ -385,8 +575,23 @@ void DisplayLinkedList(int array[])
                     {
                         BeginDrawing();
                         ClearBackground(BLACK);
-                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node to linked list",10,10,20,RAYWHITE);
-                        DrawText("Enter the Key: ",10,100,20,RAYWHITE);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,325,85+j,325,RAYWHITE);
+                            DrawLine(70+j,315,85+j,325,RAYWHITE);
+                            DrawLine(70+j,335,85+j,325,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node at the end of linked list\n4)Add a node in between",10,10,20,RAYWHITE);
+                        DrawText("Enter the Key: ",10,130,20,RAYWHITE);
                         if(code >= 48 && code <= 57 && flag)
                         {
                             element *= 10;
@@ -394,7 +599,7 @@ void DisplayLinkedList(int array[])
                         }
                         if(IsKeyPressed(KEY_BACKSPACE))
                             element /= 10;
-                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,100,20,RAYWHITE);
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,130,20,RAYWHITE);
                         code = GetKeyPressed();
                         if(code != 50)
                             flag = true;
@@ -411,8 +616,23 @@ void DisplayLinkedList(int array[])
                     {
                         BeginDrawing();
                         ClearBackground(BLACK);
-                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node to linked list",10,10,20,RAYWHITE);
-                        DrawText("Enter the Key: ",10,100,20,RAYWHITE);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,325,85+j,325,RAYWHITE);
+                            DrawLine(70+j,315,85+j,325,RAYWHITE);
+                            DrawLine(70+j,335,85+j,325,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node at the end of linked list\n4)Add a node in between",10,10,20,RAYWHITE);
+                        DrawText("Enter the Key: ",10,130,20,RAYWHITE);
                         if(code >= 48 && code <= 57 && flag)
                         {
                             element *= 10;
@@ -420,13 +640,89 @@ void DisplayLinkedList(int array[])
                         }
                         if(IsKeyPressed(KEY_BACKSPACE))
                             element /= 10;
-                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,100,20,RAYWHITE);
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,130,20,RAYWHITE);
                         code = GetKeyPressed();
                         if(code != 51)
                             flag = true;
                         EndDrawing();
                     }
                     hehe->prepend(element);
+                }
+                if(IsKeyPressed(KEY_FOUR))
+                { 
+                    int code = 0;
+                    int key = 0;
+                    element = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,325,85+j,325,RAYWHITE);
+                            DrawLine(70+j,315,85+j,325,RAYWHITE);
+                            DrawLine(70+j,335,85+j,325,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawText("Enter the Key after which you want to add Node: ",10,130,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            key *= 10;
+                            key += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            key /= 10;
+                        DrawText(TextFormat("%i",key),MeasureText("Enter the Key after which you want to add Node: ",20)+10,130,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 52)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    code = 0;
+                    flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                                DrawTexture(head,-15,350,RAYWHITE);
+                                DrawRectangle(10+j+2,300,50,50,GREEN);
+                                DrawLine(50+j,325,85+j,325,RAYWHITE);
+                                DrawLine(70+j,315,85+j,325,RAYWHITE);
+                                DrawLine(70+j,335,85+j,325,RAYWHITE);
+                                DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                                j += 70;
+                                temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawText("Enter the data for new Node: ",10,130,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the data for new Node: ",20)+10,130,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 51)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    hehe->inBetween(element,key);
                 }
                 EndDrawing();
             }
@@ -439,9 +735,12 @@ void DisplayLinkedList(int array[])
         
         if(IsKeyPressed(KEY_TWO))
         {
+            
             BeginDrawing();
             ClearBackground(BLACK);
             EndDrawing();
+            j = i = 0;
+           
             while(!WindowShouldClose() && i < 10)
             {
                 BeginDrawing();
@@ -467,12 +766,291 @@ void DisplayLinkedList(int array[])
                 } 
                 EndDrawing();
             }
+            j=i=0;
+            int element = 0;
+            Texture2D head = LoadTexture("resources/head.png");
+            DLL * hehe = (DLL*)malloc(sizeof(DLL));
+            NodeForDLL * temp = (NodeForDLL*)malloc(sizeof(NodeForDLL));
+            hehe->Copy(array);
+            head = LoadTexture("resources/head.png");
+            Texture2D tail = LoadTexture("resources/tail.png");
+            while(!WindowShouldClose())
+            {
+                BeginDrawing();
+                ClearBackground(BLACK);
+                DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node at the end of linked list\n4)Add a node in between",10,10,20,RAYWHITE);
+                j = 0;
+                temp = hehe->head;
+                while(temp -> next != NULL)
+                {
+                    DrawTexture(head,-15,350,RAYWHITE);
+                    DrawRectangle(10+j+2,300,50,50,GREEN);
+                    DrawLine(50+j,310,85+j,310,RAYWHITE);
+                    DrawLine(70+j,300,85+j,310,RAYWHITE);
+                    DrawLine(70+j,320,85+j,310,RAYWHITE);
+                    
+                    
+                    DrawLine(55+j,340,75+j,330,RAYWHITE);
+                    DrawLine(55+j,340,75+j,350,RAYWHITE);
+                    DrawLine(50+j,340,90+j,340,RAYWHITE);
+                    DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                    j += 70;
+                    temp = temp->next;  
+                }
+                DrawRectangle(10+j+2,300,50,50,GREEN);
+                DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                DrawTexture(tail,j,350,RAYWHITE);
+                if(IsKeyPressed(KEY_ONE))
+                { 
+                    int code = 0;
+                    element = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,310,85+j,310,RAYWHITE);
+                            DrawLine(70+j,300,85+j,310,RAYWHITE);
+                            DrawLine(70+j,320,85+j,310,RAYWHITE);
+                            
+                            
+                            DrawLine(55+j,340,75+j,330,RAYWHITE);
+                            DrawLine(55+j,340,75+j,350,RAYWHITE);
+                            DrawLine(50+j,340,90+j,340,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawTexture(tail,j,350,RAYWHITE);
+                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node at the end of linked list\n4)Add a node in between",10,10,20,RAYWHITE);
+                        DrawText("Enter the Key: ",10,130,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,130,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 49)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    if(!hehe->DeleteNode(element))
+                    while(!IsKeyPressed(KEY_ENTER))
+                    {
+                        BeginDrawing();
+                        DrawText("A Node with this key does not exist.\nPress enter to continue",10,160,20,RAYWHITE);
+                        EndDrawing();
+                    }
+                }
+                if(IsKeyPressed(KEY_TWO))
+                { 
+                    int code = 0;
+                    element = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,310,85+j,310,RAYWHITE);
+                            DrawLine(70+j,300,85+j,310,RAYWHITE);
+                            DrawLine(70+j,320,85+j,310,RAYWHITE);
+                            
+                            
+                            DrawLine(55+j,340,75+j,330,RAYWHITE);
+                            DrawLine(55+j,340,75+j,350,RAYWHITE);
+                            DrawLine(50+j,340,90+j,340,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawTexture(tail,j,350,RAYWHITE);
+                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node at the end of linked list\n4)Add a node in between",10,10,20,RAYWHITE);
+                        DrawText("Enter the Key: ",10,130,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,130,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 50)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    hehe->prepend(element);
+                }
+                if(IsKeyPressed(KEY_THREE))
+                { 
+                    int code = 0;
+                    element = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,310,85+j,310,RAYWHITE);
+                            DrawLine(70+j,300,85+j,310,RAYWHITE);
+                            DrawLine(70+j,320,85+j,310,RAYWHITE);
+                            
+                            
+                            DrawLine(55+j,340,75+j,330,RAYWHITE);
+                            DrawLine(55+j,340,75+j,350,RAYWHITE);
+                            DrawLine(50+j,340,90+j,340,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawTexture(tail,j,350,RAYWHITE);
+                        DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node at the end of linked list\n4)Add a node in between",10,10,20,RAYWHITE);
+                        DrawText("Enter the Key: ",10,130,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the Key: ",20)+10,130,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 51)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    hehe->append(element);
+                }
+                if(IsKeyPressed(KEY_FOUR))
+                { 
+                    int code = 0;
+                    int key = 0;
+                    element = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,310,85+j,310,RAYWHITE);
+                            DrawLine(70+j,300,85+j,310,RAYWHITE);
+                            DrawLine(70+j,320,85+j,310,RAYWHITE);
+                            
+                            
+                            DrawLine(55+j,340,75+j,330,RAYWHITE);
+                            DrawLine(55+j,340,75+j,350,RAYWHITE);
+                            DrawLine(50+j,340,90+j,340,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawTexture(tail,j,350,RAYWHITE);
+                        DrawText("Enter the Key after which you want to add Node: ",10,130,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            key *= 10;
+                            key += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            key /= 10;
+                        DrawText(TextFormat("%i",key),MeasureText("Enter the Key after which you want to add Node: ",20)+10,130,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 52)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    code = 0;
+                    flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp -> next != NULL)
+                        {
+                                DrawTexture(head,-15,350,RAYWHITE);
+                                DrawRectangle(10+j+2,300,50,50,GREEN);
+                                DrawLine(50+j,310,85+j,310,RAYWHITE);
+                                DrawLine(70+j,300,85+j,310,RAYWHITE);
+                                DrawLine(70+j,320,85+j,310,RAYWHITE);
+                                
+                                
+                                DrawLine(55+j,340,75+j,330,RAYWHITE);
+                                DrawLine(55+j,340,75+j,350,RAYWHITE);
+                                DrawLine(50+j,340,90+j,340,RAYWHITE);
+                                DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                                j += 70;
+                                temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawText("Enter the data for new Node: ",10,130,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the data for new Node: ",20)+10,130,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 51)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    hehe->AddUsingKey(element,key);
+                }
+                EndDrawing();
+                
+            }
+                CloseWindow();
+                InitWindow(screenwidth,screenheight,"Linked Lists");
+                BeginDrawing();
+                DrawText("Select one of the following options\n1)Singly Linked List\n2)Doubly Linked List\n3)Circular linked list\nEnter the format in which you want to store the data: ",10,10,20,RAYWHITE);
         }
         if(IsKeyPressed(KEY_THREE))
         {
             BeginDrawing();
             ClearBackground(BLACK);
             EndDrawing();
+            i = j = 0;
+            int element = 0;
+            NodeForCLL* temp = (NodeForCLL*)malloc(sizeof(NodeForCLL));
+            CLL * hehe = (CLL*)malloc(sizeof(CLL));
             while(!WindowShouldClose() && i < 10)
             {
                 BeginDrawing();
@@ -502,12 +1080,302 @@ void DisplayLinkedList(int array[])
                 } 
                 EndDrawing();
             }
+            hehe->Copy(array);
+            Texture2D head = LoadTexture("resources/head.png");
+            Texture2D tail = LoadTexture("resources/tail.png");
+            j=i=0;
+            element = 0;
+            while(!WindowShouldClose())
+            {
+                BeginDrawing();
+                ClearBackground(BLACK);
+                DrawText("1)Remove a node from linked list\n2)Add a node in the start\n3)Add a node at the end of linked list\n4)Add a node in between",10,10,20,RAYWHITE);
+                j = 0;
+                temp = hehe->head;
+                while(temp != hehe->tail)
+                {
+                    DrawTexture(head,-15,350,RAYWHITE);
+                    DrawRectangle(10+j+2,300,50,50,GREEN);
+                    DrawLine(50+j,325,85+j,325,RAYWHITE);
+                    DrawLine(70+j,315,85+j,325,RAYWHITE);
+                    DrawLine(70+j,335,85+j,325,RAYWHITE);
+                    DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                    j += 70;
+                    temp = temp->next;                   
+                }
+                DrawRectangle(10+j+2,300,50,50,GREEN);
+                DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                DrawTexture(tail,j,350,RAYWHITE);
+                DrawLine(37,350,37,370,RAYWHITE);
+                    
+                    DrawLine(37,350,17,360,RAYWHITE);
+                    DrawLine(37,350,57,360,RAYWHITE);
+                    
+                    DrawLine(37,370,52+j,370,RAYWHITE);
+                    DrawLine(52+j,350,52+j,370,RAYWHITE);
+                if(IsKeyPressed(KEY_ONE))
+                {
+                    
+                    int element = 0;
+                    int code = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        j=0;
+                        temp = hehe->head;
+                        while(temp != hehe->tail)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,325,85+j,325,RAYWHITE);
+                            DrawLine(70+j,315,85+j,325,RAYWHITE);
+                            DrawLine(70+j,335,85+j,325,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawTexture(tail,j,350,RAYWHITE);
+                        DrawLine(37,350,37,370,RAYWHITE);
+                    
+                        DrawLine(37,350,17,360,RAYWHITE);
+                        DrawLine(37,350,57,360,RAYWHITE);
+                        
+                        DrawLine(37,370,52+j,370,RAYWHITE);
+                        DrawLine(52+j,350,52+j,370,RAYWHITE);
+                        DrawText("Enter the key of node you want to delete: ",10,120,20,RAYWHITE);
+                        if(code >=48 && code <= 58 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the key of node you want to delete: ",20)+10,120,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 49)
+                            flag = true;
+                        
+                        EndDrawing();
+                    }
+                    if(!hehe->deleteNode(element))
+                    while(!IsKeyPressed(KEY_ENTER))
+                    {
+                        BeginDrawing();
+                        DrawText("A Node with this key does not exist.\nPress enter to continue",10,160,20,RAYWHITE);
+                        EndDrawing();
+                    }
+                }
+                if(IsKeyPressed(KEY_TWO))
+                {
+                    element = 0;
+                    int code = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        j=0;
+                        temp = hehe->head;
+                        while(temp != hehe->tail)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,325,85+j,325,RAYWHITE);
+                            DrawLine(70+j,315,85+j,325,RAYWHITE);
+                            DrawLine(70+j,335,85+j,325,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawTexture(tail,j,350,RAYWHITE);
+                        DrawLine(37,350,37,370,RAYWHITE);
+                    
+                        DrawLine(37,350,17,360,RAYWHITE);
+                        DrawLine(37,350,57,360,RAYWHITE);
+                        
+                        DrawLine(37,370,52+j,370,RAYWHITE);
+                        DrawLine(52+j,350,52+j,370,RAYWHITE);
+                        DrawText("Enter the key of node you want to Insert: ",10,120,20,RAYWHITE);
+                        if(code >=48 && code <= 58 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the key of node you want to Insert: ",20)+10,120,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 50)
+                            flag = true;
+                        
+                        EndDrawing();
+                    }
+                    hehe->prepend(element);
+                }
+                if(IsKeyPressed(KEY_THREE))
+                {
+                    element = 0;
+                    int code = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        j=0;
+                        temp = hehe->head;
+                        while(temp != hehe->tail)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,325,85+j,325,RAYWHITE);
+                            DrawLine(70+j,315,85+j,325,RAYWHITE);
+                            DrawLine(70+j,335,85+j,325,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawTexture(tail,j,350,RAYWHITE);
+                        DrawLine(37,350,37,370,RAYWHITE);
+                        
+                        DrawLine(37,350,17,360,RAYWHITE);
+                        DrawLine(37,350,57,360,RAYWHITE);
+                        
+                        DrawLine(37,370,52+j,370,RAYWHITE);
+                        DrawLine(52+j,350,52+j,370,RAYWHITE);
+                        DrawText("Enter the key of node you want to Insert: ",10,120,20,RAYWHITE);
+                        if(code >=48 && code <= 58 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the key of node you want to Insert: ",20)+10,120,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 51)
+                            flag = true;
+                        
+                        EndDrawing();
+                    }
+                    hehe->append(element);
+                }
+                if(IsKeyPressed(KEY_FOUR))
+                { 
+                    int code = 0;
+                    int key = 0;
+                    element = 0;
+                    bool flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp != hehe->tail)
+                        {
+                            DrawTexture(head,-15,350,RAYWHITE);
+                            DrawRectangle(10+j+2,300,50,50,GREEN);
+                            DrawLine(50+j,325,85+j,325,RAYWHITE);
+                            DrawLine(70+j,315,85+j,325,RAYWHITE);
+                            DrawLine(70+j,335,85+j,325,RAYWHITE);
+                            DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                            j += 70;
+                            temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawTexture(tail,j,350,RAYWHITE);
+                        DrawLine(37,350,37,370,RAYWHITE);
+                        
+                        DrawLine(37,350,17,360,RAYWHITE);
+                        DrawLine(37,350,57,360,RAYWHITE);
+                        
+                        DrawLine(37,370,52+j,370,RAYWHITE);
+                        DrawLine(52+j,350,52+j,370,RAYWHITE);
+                        DrawText("Enter the Key after which you want to add Node: ",10,130,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            key *= 10;
+                            key += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            key /= 10;
+                        DrawText(TextFormat("%i",key),MeasureText("Enter the Key after which you want to add Node: ",20)+10,130,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 52)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    code = 0;
+                    flag = false;
+                    while(code != 257 && !WindowShouldClose())
+                    {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        temp = hehe->head;
+                        j=0;
+                        while(temp!= hehe->tail)
+                        {
+                                DrawTexture(head,-15,350,RAYWHITE);
+                                DrawRectangle(10+j+2,300,50,50,GREEN);
+                                DrawLine(50+j,325,85+j,325,RAYWHITE);
+                                DrawLine(70+j,315,85+j,325,RAYWHITE);
+                                DrawLine(70+j,335,85+j,325,RAYWHITE);
+                                
+                                DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                                j += 70;
+                                temp = temp->next;                   
+                        }
+                        DrawRectangle(10+j+2,300,50,50,GREEN);
+                        DrawText(TextFormat("%i",temp->data),20+j,325,25,BLACK);
+                        DrawTexture(tail,j,350,RAYWHITE);
+                        DrawLine(37,350,37,370,RAYWHITE);
+                        
+                        DrawLine(37,350,17,360,RAYWHITE);
+                        DrawLine(37,350,57,360,RAYWHITE);
+                        
+                        DrawLine(37,370,52+j,370,RAYWHITE);
+                        DrawLine(52+j,350,52+j,370,RAYWHITE);
+                        DrawText("Enter the data for new Node: ",10,130,20,RAYWHITE);
+                        if(code >= 48 && code <= 57 && flag)
+                        {
+                            element *= 10;
+                            element += code-48;
+                        }
+                        if(IsKeyPressed(KEY_BACKSPACE))
+                            element /= 10;
+                        DrawText(TextFormat("%i",element),MeasureText("Enter the data for new Node: ",20)+10,130,20,RAYWHITE);
+                        code = GetKeyPressed();
+                        if(code != 51)
+                            flag = true;
+                        EndDrawing();
+                    }
+                    hehe->AddUsingKey(element,key);
+                }
+                EndDrawing();
+            }
+                CloseWindow();
+                InitWindow(screenwidth,screenheight,"Linked Lists");
+                BeginDrawing();
+                DrawText("Select one of the following options\n1)Singly Linked List\n2)Doubly Linked List\n3)Circular linked list\nEnter the format in which you want to store the data: ",10,10,20,RAYWHITE);
         }
         EndDrawing();
         
     }
         CloseWindow();
-}   
+}
+
 void DisplayQueue(int array[])
 {
     const int screenheight = 600;
