@@ -9,6 +9,7 @@
 using namespace std;
 int screenwidth = 800;
 int screenheight = 600;
+void load_documentation_window(void);
 void DisplayStack(int[]);
 void TakeInput(int[], char[], int, int);
 void DisplayTree(int[]);
@@ -32,9 +33,7 @@ void load_searching_window(void);
     10.ShellSort
     11.HeapSort
 */
-
 int results[11][2];
-
 int getGap(int i)
 {
     i = (i * 10) / 13;
@@ -225,8 +224,6 @@ int partition(int arr[], int low, int high)
     int i = low, j = high, pivot = arr[low];
     while (1)
     {
-        //++results[1][0];
-
         while (arr[i] < pivot)
         {
             ++i;
@@ -335,10 +332,8 @@ void ShellSort(int array[], int size)
     iter1 = iter2 = iter3 = 0;
     for (int gap = size / 2; gap > 0; gap /= 2)
     {
-        //++iter1;
         for (int i = gap; i < size; ++i)
         {
-            //++iter2;
             results[9][1]++;
             int key = array[i];
             int j;
@@ -991,55 +986,20 @@ public:
                 CloseWindow();
                 return number;
             }
-            if (IsKeyPressed(KEY_ZERO))
+            int code = GetKeyPressed();
+            if (code >= 48 && code <= 57)
             {
-                number = number * 10;
-                str[j++] = '0';
+                number *= 10;
+                number += code - 48;
+                str[j] = (char)code;
+                ++j;
+                str[j] = '\0';
             }
-            if (IsKeyPressed(KEY_ONE))
+            if (IsKeyPressed(KEY_BACKSPACE))
             {
-                number = (number * 10) + 1;
-                str[j++] = '1';
-            }
-            if (IsKeyPressed(KEY_TWO))
-            {
-                number = (number * 10) + 2;
-                str[j++] = '2';
-            }
-            if (IsKeyPressed(KEY_THREE))
-            {
-                number = (number * 10) + 3;
-                str[j++] = '3';
-            }
-            if (IsKeyPressed(KEY_FOUR))
-            {
-                number = (number * 10) + 4;
-                str[j++] = '4';
-            }
-            if (IsKeyPressed(KEY_FIVE))
-            {
-                number = (number * 10) + 5;
-                str[j++] = '5';
-            }
-            if (IsKeyPressed(KEY_SIX))
-            {
-                number = (number * 10) + 6;
-                str[j++] = '6';
-            }
-            if (IsKeyPressed(KEY_SEVEN))
-            {
-                number = (number * 10) + 7;
-                str[j++] = '7';
-            }
-            if (IsKeyPressed(KEY_EIGHT))
-            {
-                number = (number * 10) + 8;
-                str[j++] = '8';
-            }
-            if (IsKeyPressed(KEY_NINE))
-            {
-                number = (number * 10) + 9;
-                str[j++] = '9';
+               number /= 10;
+                str[j - 1] = '\0';
+                --j;
             }
             DrawText(str, MeasureText("Enter Id To search : ", 20) + 20, 100, 20, RAYWHITE);
             EndDrawing();
@@ -1065,55 +1025,20 @@ public:
                 CloseWindow();
                 return number;
             }
-            if (IsKeyPressed(KEY_ZERO))
+            int code = GetKeyPressed();
+            if (code >= 48 && code <= 57)
             {
-                number = number * 10;
-                str[j++] = '0';
+                number *= 10;
+                number += code - 48;
+                str[j] = (char)code;
+                ++j;
+                str[j] = '\0';
             }
-            if (IsKeyPressed(KEY_ONE))
+            if (IsKeyPressed(KEY_BACKSPACE))
             {
-                number = (number * 10) + 1;
-                str[j++] = '1';
-            }
-            if (IsKeyPressed(KEY_TWO))
-            {
-                number = (number * 10) + 2;
-                str[j++] = '2';
-            }
-            if (IsKeyPressed(KEY_THREE))
-            {
-                number = (number * 10) + 3;
-                str[j++] = '3';
-            }
-            if (IsKeyPressed(KEY_FOUR))
-            {
-                number = (number * 10) + 4;
-                str[j++] = '4';
-            }
-            if (IsKeyPressed(KEY_FIVE))
-            {
-                number = (number * 10) + 5;
-                str[j++] = '5';
-            }
-            if (IsKeyPressed(KEY_SIX))
-            {
-                number = (number * 10) + 6;
-                str[j++] = '6';
-            }
-            if (IsKeyPressed(KEY_SEVEN))
-            {
-                number = (number * 10) + 7;
-                str[j++] = '7';
-            }
-            if (IsKeyPressed(KEY_EIGHT))
-            {
-                number = (number * 10) + 8;
-                str[j++] = '8';
-            }
-            if (IsKeyPressed(KEY_NINE))
-            {
-                number = (number * 10) + 9;
-                str[j++] = '9';
+               number /= 10;
+                str[j - 1] = '\0';
+                --j;
             }
             DrawText(str, MeasureText("Enter Id To search : ", 20) + 20, 100, 20, RAYWHITE);
             EndDrawing();
@@ -1121,18 +1046,19 @@ public:
         CloseWindow();
         return 0;
     }
+
     void in_order(int i, int j, Node *r)
     { // inorder always couts in sorted manner
         if (r == NULL)
             return;
-        DrawCircle(i, j, 20, GREEN);
-        DrawText((to_string(r->Id)).c_str(), i - 4, j, 15, RAYWHITE);
+        DrawCircle(i, j, 20, YELLOW);
+        DrawText((to_string(r->Id)).c_str(), i - 4, j, 15, BLACK);
         in_order(i - 40, j + 80, r->left);
         in_order(i + 40, j + 80, r->right);
         if (r->left != NULL)
-            DrawLine(i, j, i - 40, j + 70, RAYWHITE);
+            DrawLine(i, j+20, i - 30, j + 60, RED);
         if (r->right != NULL)
-            DrawLine(i, j, i + 40, j + 70, RAYWHITE);
+            DrawLine(i+10, j+20, i + 30, j + 60, RED);
     }
     // DrawText((to_string(r->Id)).c_str(), x+5, y+5, 5, RED);
     void display_BST()
@@ -2368,52 +2294,15 @@ void DisplayQueue(int array[])
         }
         else
         {
-            if (IsKeyPressed(KEY_ZERO))
-                element *= 10;
-            if (IsKeyPressed(KEY_ONE))
+            int code = GetKeyPressed();
+            if (code >= 48 && code <= 57)
             {
                 element *= 10;
-                element += 1;
+                element += code - 48;
             }
-            if (IsKeyPressed(KEY_TWO))
+            if (IsKeyPressed(KEY_BACKSPACE))
             {
-                element *= 10;
-                element += 2;
-            }
-            if (IsKeyPressed(KEY_THREE))
-            {
-                element *= 10;
-                element += 3;
-            }
-            if (IsKeyPressed(KEY_FOUR))
-            {
-                element *= 10;
-                element += 4;
-            }
-            if (IsKeyPressed(KEY_FIVE))
-            {
-                element *= 10;
-                element += 5;
-            }
-            if (IsKeyPressed(KEY_SIX))
-            {
-                element *= 10;
-                element += 6;
-            }
-            if (IsKeyPressed(KEY_SEVEN))
-            {
-                element *= 10;
-                element += 7;
-            }
-            if (IsKeyPressed(KEY_EIGHT))
-            {
-                element *= 10;
-                element += 8;
-            }
-            if (IsKeyPressed(KEY_NINE))
-            {
-                element *= 10;
-                element += 9;
+                element /= 10;
             }
             DrawText(TextFormat("%i", element), MeasureText("Enter an element to Enqueue: ", 20) + 10, 70, 20, RAYWHITE);
             if (IsKeyPressed(KEY_ENTER))
@@ -2422,6 +2311,50 @@ void DisplayQueue(int array[])
                 element = 0;
             }
         }
+        EndDrawing();
+    }
+    CloseWindow();
+}
+void TakeInput(int array[], char str[], int which, int n)
+{
+    InitWindow(1000, 1000, "Managing");
+    ClearBackground(BLACK);
+
+    int i = 0;
+    int j = 0;
+    while (!WindowShouldClose() && i < n)
+    {
+        BeginDrawing();
+        ClearBackground(BLACK);
+        if (which == 1)
+            DrawText("MANAGING Data Structures", 350, 20, 30, RAYWHITE);
+        if (which == 2)
+            DrawText("Sorting", 350, 20, 30, RAYWHITE);
+        if (which == 3)
+            DrawText("Searching", 350, 20, 30, RAYWHITE);
+        DrawText("Input random values to store: ", 20, 100, 20, RAYWHITE);
+        int code = GetKeyPressed();
+        if (code >= 48 && code <= 57)
+        {
+            array[i] *= 10;
+            array[i] += code - 48;
+            str[j] = (char)code;
+            ++j;
+            str[j] = '\0';
+        }
+        if (IsKeyPressed(KEY_SPACE))
+        {
+            ++i;
+            str[j++] = ' ';
+            str[j] = '\0';
+        }
+        if (IsKeyPressed(KEY_BACKSPACE))
+        {
+            array[i] /= 10;
+            str[j - 1] = '\0';
+            --j;
+        }
+        DrawText(str, MeasureText("Input random values to store: ", 20) + 20, 100, 20, RAYWHITE);
         EndDrawing();
     }
     CloseWindow();
@@ -2485,50 +2418,7 @@ void DisplayTree(int array[])
             break;
     }
 }
-void TakeInput(int array[], char str[], int which, int n)
-{
-    InitWindow(1000, 1000, "Managing");
-    ClearBackground(BLACK);
 
-    int i = 0;
-    int j = 0;
-    while (!WindowShouldClose() && i < n)
-    {
-        BeginDrawing();
-        ClearBackground(BLACK);
-        if (which == 1)
-            DrawText("MANAGING Data Structures", 350, 20, 30, RAYWHITE);
-        if (which == 2)
-            DrawText("Sorting", 350, 20, 30, RAYWHITE);
-        if (which == 3)
-            DrawText("Searching", 350, 20, 30, RAYWHITE);
-        DrawText("Input random values to store: ", 20, 100, 20, RAYWHITE);
-        int code = GetKeyPressed();
-        if (code >= 48 && code <= 57)
-        {
-            array[i] *= 10;
-            array[i] += code - 48;
-            str[j] = (char)code;
-            ++j;
-            str[j] = '\0';
-        }
-        if (IsKeyPressed(KEY_SPACE))
-        {
-            ++i;
-            str[j++] = ' ';
-            str[j] = '\0';
-        }
-        if (IsKeyPressed(KEY_BACKSPACE))
-        {
-            array[i] /= 10;
-            str[j - 1] = '\0';
-            --j;
-        }
-        DrawText(str, MeasureText("Input random values to store: ", 20) + 20, 100, 20, RAYWHITE);
-        EndDrawing();
-    }
-    CloseWindow();
-}
 void DisplayStack(int array[])
 {
     SetTargetFPS(144);
@@ -2655,7 +2545,6 @@ void storing()
 
         if (c != ' ')
         {
-            int num = int(c);
             arr[i] = arr[i] + c;
         }
     }
@@ -2745,7 +2634,6 @@ void rsearch(int arr[], int index[], int x)
 
     w = 0;
     int p = 0, freq = 0;
-    bool flag;
     if (arr[pos] <= num)
     {
         for (int q = pos; q < x; q++)
@@ -2789,7 +2677,7 @@ void rsearch(int arr[], int index[], int x)
         int multiplier = 1;
         while (arr[p] == num)
         {
-            DrawText(TextFormat("%i", index[p]), temp+10+multiplier*10, 150, 20, RAYWHITE);
+            DrawText(TextFormat("%i", index[p]), temp + 10 + multiplier * 10, 150, 20, RAYWHITE);
             ++multiplier;
             temp += MeasureText(TextFormat("%i", index[p]), 20);
             DrawText(",", MeasureText(TextFormat("%i", index[p]), 20) + 2, 150, 20, RAYWHITE);
@@ -2803,106 +2691,6 @@ void rsearch(int arr[], int index[], int x)
     CloseWindow();
 }
 
-void load_documentation_window(void)
-{
-    InitWindow(1000, 1000, "Documentations");
-    SetTargetFPS(60);
-
-    Rectangle forbst = {330.0f, 330.0f, 10.0f + 330.0f, 600.0f};
-    Rectangle foravl = {330.0f, 330.0f, 10.0f + 330.0f + 330.0f, 600.0f};
-    bool once = false;
-    Texture2D loader;
-    while (!WindowShouldClose())
-    {
-        BeginDrawing();
-        ClearBackground(BLACK);
-        DrawText("Select any one of the options: ", 20, 100, 20, RAYWHITE);
-        DrawText("Documentations", 470, 20, 30, RAYWHITE);
-        DrawText("1) Stacks\n2) Queues\n3) Linked Lists\n4) Trees", 20, 140, 20, RAYWHITE);
-
-        if (IsKeyPressed(KEY_ONE))
-        {
-
-            while (!WindowShouldClose())
-            {
-                loader = LoadTexture("resources/stackimage.png");
-
-                BeginDrawing();
-                ClearBackground(BLACK);
-                DrawText("Stacks", 470, 10, 30, RAYWHITE);
-                DrawText("Stack is a linear data structure which follows a particular order in which the operations are\n performed. The order may be LIFO(Last In First Out) or FILO(First In Last Out)", 20, 100, 20, RAYWHITE);
-                DrawText("There are many real-life examples of a stack. Consider an example of plates stacked over\n one another in the canteen. The plate which is at the top is the first one to be\nremoved, i.e. the plate which has been placed at the bottommost position remains \nin the stack for the longest period of time. So, it can be simply seen to follow LIFO(Last In First Out)/FILO(First In Last Out) order.", 20, 200, 20, RAYWHITE);
-                DrawTexture(loader, 30, 400, RAYWHITE);
-                EndDrawing();
-                once = true;
-            }
-        }
-        if (IsKeyPressed(KEY_TWO) && once)
-        {
-            while (!WindowShouldClose())
-            {
-                loader = LoadTexture("resources/queueimage.png");
-                BeginDrawing();
-                ClearBackground(BLACK);
-                DrawText("Queue", 470, 10, 30, RAYWHITE);
-                DrawText("A queue is defined as a linear data structure that is open at both ends and \nthe operations are performed in First In First Out (FIFO) order.\nWe define a queue to be a list in which all additions to the list are made at one end, and all \ndeletions from the list are made at the other end.  The element which is first pushed into the \norder, the operation is first performed on that.", 20, 100, 20, RAYWHITE);
-                DrawText("Like stacks, Queues can also be represented in an array: \nIn this representation, the Queue is implemented using the array. \nVariables used in this case are:", 20, 290, 20, RAYWHITE);
-                DrawText("Queue Representation: ", 20, 400, 30, RAYWHITE);
-
-                DrawText("Queue: the name of the array storing queue elements.", 60, 450, 20, RAYWHITE);
-                DrawText("Front: the index where the first element is stored in the array representing the queue.", 60, 480, 20, RAYWHITE);
-                DrawText("Rear: the index where the last element is stored in an array representing the queue.", 60, 510, 20, RAYWHITE);
-                DrawTexture(loader, 30, 600, RAYWHITE);
-                EndDrawing();
-            }
-        }
-
-        if (IsKeyPressed(KEY_THREE))
-        {
-            while (!WindowShouldClose())
-            {
-                loader = LoadTexture("resources/llimage.png");
-                BeginDrawing();
-                ClearBackground(BLACK);
-                DrawText("Linked Lists", 400, 10, 30, RAYWHITE);
-                DrawText("A linked list consists of nodes where each node contains a data field and \na reference(link) to the next node in the list.", 20, 100, 20, RAYWHITE);
-                DrawText("It is a linear data structure, in which the elements are not stored at \ncontiguous memory locations.", 20, 200, 20, RAYWHITE);
-                DrawText("There are three types of linked lists: ", 20, 300, 20, RAYWHITE);
-                DrawText("1)Singly Linked List: Each node links to only the next node in the sequence\n2)Doubly Linked List: Each node links to the next as well as previous node in the sequence\n3)Circular Linked List: The last node links to the first node", 20, 350, 20, RAYWHITE);
-                DrawTexture(loader, 30, 600, RAYWHITE);
-                EndDrawing();
-            }
-            once = true;
-        }
-        if (IsKeyPressed(KEY_FOUR))
-        {
-            while (!WindowShouldClose())
-            {
-
-                loader = LoadTexture("resources/bst.png");
-                BeginDrawing();
-                ClearBackground(BLACK);
-                DrawText("Trees", 10, 10, 30, RAYWHITE);
-                DrawTexture(loader, 10, 600, RAYWHITE);
-                DrawText("A tree is a nonlinear data structure, compared to arrays, linked lists, stacks and queues \nwhich are linear data structures. \nA tree can be empty with no nodes or a tree is a structure consisting of one node called the \nroot and zero or one or more subtrees.", 10, 70, 20, RAYWHITE);
-                DrawText("Binary Search Trees", 10, 220, 30, RAYWHITE);
-                DrawText("Binary Search Tree is a node-based binary tree data structure which has the following \nproperties:", 10, 260, 20, RAYWHITE);
-                DrawText("1)The left subtree of a node contains only nodes with keys lesser than the node’s key.\n2)The right subtree of a node contains only nodes with keys greater than the node’s key.\n3)The left and right subtree each must also be a binary search tree.", 10, 310, 20, RAYWHITE);
-                DrawText("AVL Trees", 10, 400, 30, RAYWHITE);
-                DrawText("Similarly, an AVL TREE is defined as a height balanced binary search tree in which each node \nis associated with a balance factor which is calculated by subtracting the height of \nleft subtree and height of right subtree", 10, 450, 20, RAYWHITE);
-                int hehe = loader.width;
-                loader = LoadTexture("resources/avl.png");
-                DrawTexture(loader, hehe + 30, 600, RAYWHITE);
-                DrawText("AVL TREE", hehe + 300, 500 + loader.height + 60, 20, BLACK);
-                EndDrawing();
-            }
-            once = true;
-        }
-        EndDrawing();
-    }
-
-    CloseWindow();
-}
 void load_sorting_window(void)
 {
     InitWindow(1000, 1000, "Sorting");
@@ -3034,7 +2822,7 @@ int main(void)
         DrawText("Muhammad Humza (21k-3293)", screenwidth - MeasureText("Muhammad Humza (21k-XXXX)", 20) - 10, screenheight - 20, 20, RAYWHITE);
         DrawText("Yaazir Mehdi (21k-3460)", screenwidth - MeasureText("Muhammad Humza (21k-XXXX)", 20) - 10, screenheight - 40, 20, RAYWHITE);
         DrawText("Bilal Hassan (21k-4669)", screenwidth - MeasureText("Muhammad Humza (21k-XXXX)", 20) - 10, screenheight - 60, 20, RAYWHITE);
-        DrawText("Click on anyone of the following options:", 10.0f, 70.0f, 20, RAYWHITE);
+        DrawText("Select anyone of the following options:", 10.0f, 70.0f, 20, RAYWHITE);
         DrawText("Made By:", screenwidth - MeasureText("Muhammad Humza (21k-3293)", 20) - 10, screenheight - 80, 20, RAYWHITE);
         DrawRectangleRec(managing, BLACK);
         DrawRectangleRec(searching, BLACK);
@@ -3079,5 +2867,103 @@ int main(void)
 void load_searching_window(void)
 {
     storing();
+    main();
+}
+void load_documentation_window(void)
+{
+    InitWindow(1000, 1000, "Documentations");
+    SetTargetFPS(60);
+    bool once = false;
+    Texture2D loader;
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawText("Select any one of the options: ", 20, 100, 20, RAYWHITE);
+        DrawText("Documentations", 470, 20, 30, RAYWHITE);
+        DrawText("1) Stacks\n2) Queues\n3) Linked Lists\n4) Trees", 20, 140, 20, RAYWHITE);
+
+        if (IsKeyPressed(KEY_ONE))
+        {
+
+            while (!WindowShouldClose())
+            {
+                loader = LoadTexture("resources/stackimage.png");
+
+                BeginDrawing();
+                ClearBackground(BLACK);
+                DrawText("Stacks", 470, 10, 30, RAYWHITE);
+                DrawText("Stack is a linear data structure which follows a particular order in which the operations are\n performed. The order may be LIFO(Last In First Out) or FILO(First In Last Out)", 20, 100, 20, RAYWHITE);
+                DrawText("There are many real-life examples of a stack. Consider an example of plates stacked over\n one another in the canteen. The plate which is at the top is the first one to be\nremoved, i.e. the plate which has been placed at the bottommost position remains \nin the stack for the longest period of time. So, it can be simply seen to follow LIFO(Last In First Out)/FILO(First In Last Out) order.", 20, 200, 20, RAYWHITE);
+                DrawTexture(loader, 30, 400, RAYWHITE);
+                EndDrawing();
+                once = true;
+            }
+        }
+        if (IsKeyPressed(KEY_TWO) && once)
+        {
+            while (!WindowShouldClose())
+            {
+                loader = LoadTexture("resources/queueimage.png");
+                BeginDrawing();
+                ClearBackground(BLACK);
+                DrawText("Queue", 470, 10, 30, RAYWHITE);
+                DrawText("A queue is defined as a linear data structure that is open at both ends and \nthe operations are performed in First In First Out (FIFO) order.\nWe define a queue to be a list in which all additions to the list are made at one end, and all \ndeletions from the list are made at the other end.  The element which is first pushed into the \norder, the operation is first performed on that.", 20, 100, 20, RAYWHITE);
+                DrawText("Like stacks, Queues can also be represented in an array: \nIn this representation, the Queue is implemented using the array. \nVariables used in this case are:", 20, 290, 20, RAYWHITE);
+                DrawText("Queue Representation: ", 20, 400, 30, RAYWHITE);
+
+                DrawText("Queue: the name of the array storing queue elements.", 60, 450, 20, RAYWHITE);
+                DrawText("Front: the index where the first element is stored in the array representing the queue.", 60, 480, 20, RAYWHITE);
+                DrawText("Rear: the index where the last element is stored in an array representing the queue.", 60, 510, 20, RAYWHITE);
+                DrawTexture(loader, 30, 600, RAYWHITE);
+                EndDrawing();
+            }
+        }
+
+        if (IsKeyPressed(KEY_THREE))
+        {
+            while (!WindowShouldClose())
+            {
+                loader = LoadTexture("resources/llimage.png");
+                BeginDrawing();
+                ClearBackground(BLACK);
+                DrawText("Linked Lists", 400, 10, 30, RAYWHITE);
+                DrawText("A linked list consists of nodes where each node contains a data field and \na reference(link) to the next node in the list.", 20, 100, 20, RAYWHITE);
+                DrawText("It is a linear data structure, in which the elements are not stored at \ncontiguous memory locations.", 20, 200, 20, RAYWHITE);
+                DrawText("There are three types of linked lists: ", 20, 300, 20, RAYWHITE);
+                DrawText("1)Singly Linked List: Each node links to only the next node in the sequence\n2)Doubly Linked List: Each node links to the next as well as previous node in the sequence\n3)Circular Linked List: The last node links to the first node", 20, 350, 20, RAYWHITE);
+                DrawTexture(loader, 30, 600, RAYWHITE);
+                EndDrawing();
+            }
+            once = true;
+        }
+        if (IsKeyPressed(KEY_FOUR))
+        {
+            while (!WindowShouldClose())
+            {
+
+                loader = LoadTexture("resources/bst.png");
+                BeginDrawing();
+                ClearBackground(BLACK);
+                DrawText("Trees", 10, 10, 30, RAYWHITE);
+                DrawTexture(loader, 10, 600, RAYWHITE);
+                DrawText("A tree is a nonlinear data structure, compared to arrays, linked lists, stacks and queues \nwhich are linear data structures. \nA tree can be empty with no nodes or a tree is a structure consisting of one node called the \nroot and zero or one or more subtrees.", 10, 70, 20, RAYWHITE);
+                DrawText("Binary Search Trees", 10, 220, 30, RAYWHITE);
+                DrawText("Binary Search Tree is a node-based binary tree data structure which has the following \nproperties:", 10, 260, 20, RAYWHITE);
+                DrawText("1)The left subtree of a node contains only nodes with keys lesser than the node’s key.\n2)The right subtree of a node contains only nodes with keys greater than the node’s key.\n3)The left and right subtree each must also be a binary search tree.", 10, 310, 20, RAYWHITE);
+                DrawText("AVL Trees", 10, 400, 30, RAYWHITE);
+                DrawText("Similarly, an AVL TREE is defined as a height balanced binary search tree in which each node \nis associated with a balance factor which is calculated by subtracting the height of \nleft subtree and height of right subtree", 10, 450, 20, RAYWHITE);
+                int hehe = loader.width;
+                loader = LoadTexture("resources/avl.png");
+                DrawTexture(loader, hehe + 30, 600, RAYWHITE);
+                DrawText("AVL TREE", hehe + 300, 500 + loader.height + 60, 20, BLACK);
+                EndDrawing();
+            }
+            once = true;
+        }
+        EndDrawing();
+    }
+
+    CloseWindow();
     main();
 }
